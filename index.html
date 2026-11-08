@@ -4,133 +4,128 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>*,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}</style>
-<title>地図アプリ画面 ④</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<title>GPS TAG 追跡画面 ④</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
 <style>
-/* s92 / 地図④ — 架空の地図アプリの画面。現在地もピンも移動しない(位置と地図の大きさ・向きは編集モードで調整) */
+/* s92 / GPS④ — GPS③(s89)と同じ見た目。違いは地図と「タグも現在地も移動しない」(位置と地図の場所・大きさは編集モードで調整) */
 :root{
   color-scheme: light;
-  --page:#e9ecef;
-  --sheet:#ffffff; --soft:#f1f3f5; --line:#e3e6ea;
-  --ink:#1f2933; --dim:#5f6b76; --faint:#9aa4ae;
-  --acc:#1e7be6; --acc-soft:rgba(30,123,230,.14);
-  --pin:#e8453c;
+  --page:#1d2226;
+  --panel:#ffffff; --panel2:#f3f5f6; --line:#d9dee2;
+  --ink:#16202a; --dim:#5e6b77; --faint:#98a3ad;
+  --me:#00a296; --me-soft:rgba(0,162,150,.16);
+  --tag:#e5231b; --tag-soft:rgba(229,35,27,.16);
+  --ok:#2e9e4f; --north:#e0261b;
   --jp:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 html,body{height:100%}
 body{background:var(--page);color:var(--ink);font-family:var(--jp);margin:0;overflow:hidden;
   display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-.device{position:relative;width:100%;height:100%;overflow:hidden;background:#f4f1ea}
+.device{position:relative;width:100%;height:100%;overflow:hidden;background:#fff}
 @media (min-width:480px){
   body{padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-  .device{flex:none;width:414px;height:896px;border-radius:44px;transform-origin:center;box-shadow:0 0 0 10px #15181b,0 0 0 11px #3a4148,0 30px 80px rgba(0,0,0,.35)}
+  .device{flex:none;width:414px;height:896px;border-radius:44px;transform-origin:center;box-shadow:0 0 0 10px #0d1013,0 0 0 11px #3a4148,0 30px 80px rgba(0,0,0,.5)}
 }
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 
 .sb{position:absolute;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 26px 0 32px;font:600 15px -apple-system,"SF Pro Text",sans-serif;z-index:6;color:var(--ink)}
+  padding:0 26px 0 32px;font:600 15px -apple-system,"SF Pro Text",sans-serif;z-index:6;color:#fff}
 .sb .icons{display:flex;gap:6px;align-items:center}
-.sb svg{display:block;fill:var(--ink)}
+.sb svg{display:block;fill:#fff}
 .homebar{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);z-index:12}
 
-/* 上部: 検索バーとカテゴリ */
-.top{position:absolute;top:0;left:0;right:0;z-index:5;padding:50px 12px 0;pointer-events:none;
-  background:linear-gradient(rgba(244,241,234,.85),rgba(244,241,234,0) 100%)}
-.top>*{pointer-events:auto}
-.search{display:flex;align-items:center;gap:10px;height:50px;padding:0 8px 0 14px;background:#fff;border-radius:25px;
-  box-shadow:0 2px 6px rgba(31,41,51,.12),0 6px 18px rgba(31,41,51,.10)}
-.search .ph{flex:1;font-size:15px;font-weight:500;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.search .mic{width:34px;height:34px;display:grid;place-items:center}
-.avatar{width:34px;height:34px;border-radius:50%;background:#7a5af5;color:#fff;font-weight:700;font-size:14px;display:grid;place-items:center}
-.chips{display:flex;gap:8px;overflow:hidden;padding:10px 0 12px}
-.chip{flex:none;display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:16px;background:#fff;
-  font-size:13px;font-weight:700;color:var(--ink);box-shadow:0 1px 4px rgba(31,41,51,.14)}
-.chip svg{display:block}
+.top{position:absolute;top:0;left:0;right:0;z-index:5;background:var(--ink);color:#fff;
+  box-shadow:0 6px 18px rgba(20,32,42,.12);padding:44px 12px 0}
+.appbar{display:flex;align-items:center;gap:8px;padding:2px 4px 12px}
+.appbar .ttl{font-weight:700;font-size:15px;letter-spacing:.04em}
+.appbar .logo{display:block;width:30px;height:30px;border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,.35),inset 0 0 0 .5px rgba(255,255,255,.25)}
+.appbar .logo svg{display:block;border-radius:7px}
+.appbar .mode{margin-left:auto;font:600 10.5px var(--mono);letter-spacing:.14em;color:var(--ink);background:#fff;padding:3px 7px;border-radius:3px}
 
-/* 右側のボタン */
-.fabs{position:absolute;right:12px;z-index:8;display:flex;flex-direction:column;align-items:center;gap:12px}
-#fabsT{top:170px}
-#fabsB{bottom:300px}
-.fab{width:46px;height:46px;border-radius:50%;border:0;background:#fff;display:grid;place-items:center;cursor:pointer;
-  box-shadow:0 2px 8px rgba(31,41,51,.22);transition:background .2s,transform .1s}
+.fabs{position:absolute;right:12px;bottom:110px;z-index:8;display:flex;flex-direction:column;align-items:center;gap:12px}
+#compass{width:62px;height:62px;filter:drop-shadow(0 2px 5px rgba(20,32,42,.25))}
+#compass svg{width:100%;height:100%;display:block}
+.fab{width:50px;height:50px;border-radius:50%;border:0;background:#fff;display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 2px 8px rgba(20,32,42,.28);transition:background .2s,transform .1s}
 .fab:active{transform:scale(.94)}
-.fab:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.fab:focus-visible{outline:2px solid var(--me);outline-offset:2px}
 .fab svg{display:block}
-#b-locate{width:54px;height:54px;border-radius:16px}
-#b-locate.on{background:var(--acc)}
+#b-locate.on{background:var(--me)}
 #b-locate.on path,#b-locate.on circle{stroke:#fff}
 #b-locate.on .dot{fill:#fff}
-#compass{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(31,41,51,.22);display:grid;place-items:center}
-#compass svg{display:block}
-
-/* 縮尺 */
-#scale{position:absolute;left:14px;z-index:7;font-size:11px;font-weight:700;color:var(--ink);text-shadow:0 0 3px #fff,0 0 3px #fff}
-#scale .bar{height:6px;border:2px solid var(--ink);border-top:0;margin-top:2px;box-shadow:0 0 0 1px rgba(255,255,255,.8)}
+#b-refresh.spin svg{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fabs.left{right:auto;left:12px}
 
 .toast{position:absolute;left:50%;z-index:9;transform:translate(-50%,-6px);opacity:0;transition:opacity .25s,transform .25s;
   background:var(--ink);color:#fff;font-size:13px;font-weight:700;padding:9px 14px;border-radius:999px;white-space:nowrap;
-  box-shadow:0 4px 14px rgba(0,0,0,.25);pointer-events:none}
+  display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,.25);pointer-events:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+.toast i{width:8px;height:8px;border-radius:50%;background:#4cd577}
 
-#picker{position:absolute;inset:0;z-index:30;background:#f4f1ea;display:grid;place-items:center;padding:24px;color:var(--ink)}
+#picker{position:absolute;inset:0;z-index:30;background:var(--ink);display:grid;place-items:center;padding:24px;color:#fff}
 .pk{display:grid;justify-items:center;gap:12px;text-align:center;max-width:300px}
 .pk b{font-size:18px}
-.pk p{margin:0;font-size:13px;line-height:1.6;color:var(--dim)}
-.pkbtn{margin-top:6px;background:var(--acc);color:#fff;font-weight:700;font-size:15px;padding:12px 26px;border-radius:24px;cursor:pointer}
+.pk p{margin:0;font-size:13px;line-height:1.6;color:#b7c1ca}
+.pkbtn{margin-top:6px;background:var(--me);color:#fff;font-weight:700;font-size:15px;padding:12px 26px;border-radius:10px;cursor:pointer}
 .pkbtn:focus-within,.pkbtn:hover{filter:brightness(1.08)}
-.pknote{color:#c0392b!important}
+.pknote{color:#ffb4ae!important}
 
-/* メニュー */
 #menu{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;
-  background:rgba(31,41,51,.32);opacity:0;pointer-events:none;transition:opacity .25s}
+  background:rgba(13,18,24,.42);opacity:0;pointer-events:none;transition:opacity .25s}
 #menu.open{opacity:1;pointer-events:auto}
-.msheet{background:#fff;border-radius:20px 20px 0 0;padding:10px 0 calc(30px + env(safe-area-inset-bottom,0px));transform:translateY(24px);transition:transform .25s}
+.msheet{background:#fff;border-radius:16px 16px 0 0;padding:10px 0 calc(30px + env(safe-area-inset-bottom,0px));transform:translateY(24px);transition:transform .25s}
 #menu.open .msheet{transform:none}
-.mhead{display:flex;align-items:center;gap:12px;padding:8px 18px 12px}
-.mhead b{font-size:16px}
-.mhead small{display:block;font-size:12px;color:var(--dim);font-weight:500}
-.mclose{margin-left:auto;width:32px;height:32px;border-radius:50%;border:0;background:var(--soft);display:grid;place-items:center;cursor:pointer}
+.mhead{display:flex;align-items:center;padding:6px 18px 10px}
+.mhead b{font-size:17px}
+.mclose{margin-left:auto;width:32px;height:32px;border-radius:50%;border:0;background:var(--panel2);display:grid;place-items:center;cursor:pointer}
+.mdev{display:flex;align-items:center;gap:12px;margin:0 16px 8px;padding:12px;border-radius:8px;background:var(--panel2)}
+.mdev .ic{width:36px;height:36px;border-radius:8px;background:var(--tag);display:grid;place-items:center}
+.mdev .n{font:600 15px var(--mono)}
+.mdev .s{font-size:12px;color:var(--ok);font-weight:700}
 .mlist{list-style:none;margin:0;padding:0}
-.mlist li{display:flex;align-items:center;gap:16px;padding:14px 22px;border-top:1px solid var(--line);font-size:15px;font-weight:500}
+.mlist li{display:flex;align-items:center;gap:14px;padding:13px 20px;border-top:1px solid var(--line);font-size:15px;font-weight:500}
 .mlist li svg{flex:none}
 .mlist li .chev{margin-left:auto;color:var(--faint)}
 .mlist li.tap{cursor:pointer}
 
-/* 下部シート: 選んだ場所 */
-#ui{position:absolute;left:0;right:0;bottom:0;z-index:10;background:var(--sheet);color:var(--ink);border-radius:20px 20px 0 0;
-  box-shadow:0 -4px 20px rgba(31,41,51,.14);padding:8px 16px calc(28px + env(safe-area-inset-bottom,0px))}
-.grab{width:38px;height:5px;border-radius:3px;background:#d3d8dd;margin:0 auto 10px}
-.pname{font-size:21px;font-weight:900;letter-spacing:.02em;line-height:1.3}
-.pmeta{margin-top:3px;font-size:13px;color:var(--dim);font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.pmeta .dot{color:var(--faint)}
-.pmeta .walk{display:inline-flex;align-items:center;gap:3px;color:var(--ink);font-weight:700}
-.acts{display:flex;gap:8px;margin-top:14px;overflow:hidden}
-.act{flex:none;display:flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:19px;border:1.5px solid var(--line);background:#fff;
-  font:700 14px var(--jp);color:var(--acc)}
-.act.primary{background:var(--acc);border-color:var(--acc);color:#fff}
-.act svg{display:block}
+#ui{position:absolute;left:0;right:0;bottom:0;z-index:10;background:var(--ink);color:#fff;
+  padding:12px 16px calc(26px + env(safe-area-inset-bottom,0px))}
+#ui-main{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.dev{width:40px;height:40px;border-radius:8px;background:var(--tag);display:grid;place-items:center}
+.dname{font:600 15px var(--mono);letter-spacing:.06em}
+.dsub{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:#9fe3b4}
+.dsub i{width:8px;height:8px;border-radius:50%;background:#4cd577;animation:bl 1.6s ease-in-out infinite}
+@keyframes bl{50%{opacity:.25}}
 
 /* 隠し操作パネル: 地図を長押し */
-#ctrl{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+#ctrl{margin-top:12px;border-top:1px solid #33404b;padding-top:12px}
+#ctrl-btns{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:10px}
+.cbtn{background:#2b3640;border:0;border-radius:8px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer}
+#cbtn-play{background:var(--me);width:48px;height:48px}
+.cbtn:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .crow{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.clabel{color:var(--dim);font-size:11px;white-space:nowrap;width:28px}
-.cval{color:var(--acc);font:700 12px var(--jp);min-width:44px;text-align:right}
-input[type=range]{flex:1;min-width:0;accent-color:var(--acc)}
-.hint{font-size:10.5px;color:var(--faint);text-align:center;margin-top:6px}
+.clabel{color:#9aa6b1;font-size:11px;white-space:nowrap;width:28px}
+.cval{color:#7ee0d6;font:600 12px var(--mono);min-width:44px;text-align:right}
+input[type=range]{flex:1;min-width:0;accent-color:var(--me)}
+.hint{font-size:10.5px;color:#6f7d89;text-align:center;margin-top:6px}
 .seg{flex:1;display:flex;gap:6px}
-.seg button{flex:1;height:30px;border:0;border-radius:8px;background:var(--soft);color:var(--dim);font:700 12px var(--jp);cursor:pointer}
-.seg button.on{background:var(--acc);color:#fff}
-#editseg button[data-ed="tag"].on{background:var(--pin)}
-.seg button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.seg.tools button{color:var(--ink)}
-.vinfo{flex:1;font-size:11.5px;font-weight:700;color:var(--acc);white-space:nowrap}
+.seg button{flex:1;height:30px;border:0;border-radius:6px;background:#2b3640;color:#9aa6b1;font:700 12px var(--jp);cursor:pointer}
+.seg button.on{background:var(--me);color:#fff}
+#editseg button[data-ed="tag"].on{background:var(--tag)}
+.seg button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.seg.tools button{color:#dfe5ea}
+.vinfo{flex:1;font-size:11.5px;font-weight:700;color:var(--acc,#00a296);white-space:nowrap}
+.jpname{font-family:var(--jp)!important;letter-spacing:.08em}
 
 @media (max-width:479px){
   .sb,.homebar{display:none}
-  .top{padding-top:max(10px,env(safe-area-inset-top,0px))}
+  .top{padding-top:max(8px,env(safe-area-inset-top,0px))}
 }
+@media (prefers-reduced-motion:reduce){.dsub i{animation:none}}
 </style>
 </head>
 <body>
@@ -141,46 +136,51 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--acc)}
     <span id="clock">14:52</span>
     <span class="icons" aria-hidden="true">
       <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
-      <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#1f2933" stroke-opacity=".4"/><rect x="2" y="2" width="15" height="9" rx="2"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill-opacity=".4"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="15" height="9" rx="2"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill-opacity=".4"/></svg>
     </span>
   </div>
 
   <div class="top" id="top">
-    <div class="search">
-      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c-4 0-7 3-7 6.9C5 14.6 12 21.5 12 21.5s7-6.9 7-12.1c0-3.9-3-6.9-7-6.9z" fill="#e8453c"/><circle cx="12" cy="9.4" r="2.8" fill="#fff"/></svg>
-      <span class="ph">場所や住所を検索</span>
-      <span class="mic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6b76" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></span>
-      <button class="avatar" id="b-menu" type="button" aria-label="メニュー" style="border:0;cursor:pointer;padding:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.8 20.5c.6-4.2 4-6.8 8.2-6.8s7.6 2.6 8.2 6.8z"/></svg></button>
-    </div>
-    <div class="chips" aria-hidden="true">
-      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M14 9h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3"/><path d="M7 7h4"/></svg>ガソリンスタンド</span>
-      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg>コンビニ</span>
-      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>駐車場</span>
-      <span class="chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="2" stroke-linecap="round"><path d="M12 6v12M6 12h12"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg>病院</span>
+    <div class="appbar">
+      <span class="logo" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 60 60">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2fd0bf"/><stop offset="1" stop-color="#00877c"/></linearGradient></defs>
+          <rect width="60" height="60" rx="14" fill="url(#lg)"/>
+          <circle cx="30" cy="27" r="17" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>
+          <path d="M30 12c-7.2 0-13 5.6-13 12.6C17 34 30 47 30 47s13-13 13-22.4C43 17.6 37.2 12 30 12z" fill="#fff"/>
+          <circle cx="30" cy="25" r="6.2" fill="#e5231b"/>
+          <circle cx="30" cy="25" r="2.4" fill="#fff"/>
+        </svg>
+      </span>
+      <span class="ttl">見守りタグを探す</span>
+      <span class="mode">TRACKING</span>
     </div>
   </div>
 
-  <div class="fabs" id="fabsT">
-    <button class="fab" id="b-layer" type="button" aria-label="地図の種類">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="1.9" stroke-linejoin="round"><path d="M12 3 2 8.5 12 14l10-5.5L12 3z"/><path d="m2 13 10 5.5L22 13" stroke-linecap="round"/></svg>
-    </button>
+  <div class="fabs" id="fabs">
     <div id="compass" aria-hidden="true">
-      <svg width="34" height="34" viewBox="0 0 40 40"><g id="needle">
-        <polygon points="20,3 14.5,20 25.5,20" fill="#e8453c"/>
-        <polygon points="20,37 14.5,20 25.5,20" fill="#c9cfd5"/>
-      </g><circle cx="20" cy="20" r="2.4" fill="#fff"/></svg>
+      <svg viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="56" fill="#fff" stroke="#d9dee2" stroke-width="2"/>
+        <g id="dial"></g>
+        <g id="needle">
+          <polygon points="60,14 51,60 69,60" fill="#e0261b"/>
+          <polygon points="60,106 51,60 69,60" fill="#16202a"/>
+          <text x="60" y="11" font-size="15" font-weight="800" font-family="-apple-system,sans-serif" text-anchor="middle" fill="#e0261b" id="ntext">N</text>
+        </g>
+        <circle cx="60" cy="60" r="6" fill="#fff" stroke="#16202a" stroke-width="2"/>
+      </svg>
     </div>
-  </div>
-  <div class="fabs" id="fabsB">
     <button class="fab" id="b-locate" type="button" aria-label="現在地を表示" aria-pressed="false">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e7be6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 3 10.5l7.5 3 3 7.5L21 3z" class="dot" fill="#1e7be6"/></svg>
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00a296" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><path d="M12 1.5v3.5M12 19v3.5M1.5 12H5M19 12h3.5"/><circle class="dot" cx="12" cy="12" r="2.6" fill="#00a296" stroke="none"/></svg>
+    </button>
+    <button class="fab" id="b-menu" type="button" aria-label="メニュー">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
   </div>
-  <div id="scale" aria-hidden="true"><span id="scale-t">100 m</span><div class="bar" id="scale-b" style="width:60px"></div></div>
 
   <div id="picker">
     <div class="pk">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1e7be6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00a296" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>
       <b>地図画像を読み込む</b>
       <p>s92で使う地図の画像ファイルを選んでください。元の画質のまま表示します。</p>
       <label class="pkbtn" for="mapfile">画像を選択</label>
@@ -188,39 +188,54 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--acc)}
       <p class="pknote" id="pkerr" hidden></p>
     </div>
   </div>
-  <div class="toast" id="toast" role="status"><span id="toast-msg"></span></div>
+  <div class="toast" id="toast" role="status"><i></i><span id="toast-msg">最新の位置情報を取得しました</span></div>
+
+  <div class="fabs left" id="fabsL">
+    <button class="fab" id="b-refresh" type="button" aria-label="最新の情報を取得">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 6.1"/><path d="M20 4v7h-7"/></svg>
+    </button>
+  </div>
 
   <div id="menu" aria-hidden="true">
     <div class="msheet" role="dialog" aria-label="メニュー">
-      <div class="mhead"><span class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.8 20.5c.6-4.2 4-6.8 8.2-6.8s7.6 2.6 8.2 6.8z"/></svg></span><div><b>マイページ</b><small>保存した場所・履歴</small></div>
-        <button class="mclose" id="m-close" type="button" aria-label="閉じる"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+      <div class="mhead"><b>メニュー</b>
+        <button class="mclose" id="m-close" type="button" aria-label="閉じる"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg></button>
+      </div>
+      <div class="mdev">
+        <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fff"/><circle cx="12" cy="12" r="3.5" fill="#e5231b"/></svg></div>
+        <div><div class="n" id="m-name">TAG-01</div><div class="s">受信中</div></div>
       </div>
       <ul class="mlist">
-        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="1.8" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>保存済み<span class="chev">›</span></li>
-        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>検索履歴<span class="chev">›</span></li>
-        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>オフラインマップ<span class="chev">›</span></li>
-        <li class="tap" id="m-map" role="button" tabindex="0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>地図画像を変更<span class="chev">›</span></li>
-        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" stroke-linecap="round"/></svg>設定<span class="chev">›</span></li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>移動履歴<span class="chev">›</span></li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="1.8"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="2.5" fill="#16202a"/></svg>エリア通知の設定<span class="chev">›</span></li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 0 0 4 0"/></svg>通知<span class="chev">›</span></li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M11 18h2"/></svg>登録端末の管理<span class="chev">›</span></li>
+        <li class="tap" id="m-map" role="button" tabindex="0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>地図画像を変更<span class="chev">›</span></li>
+        <li><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16202a" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5" stroke-linecap="round"/></svg>アプリについて<span class="chev">›</span></li>
       </ul>
     </div>
   </div>
 
   <div id="ui">
-    <div class="grab"></div>
-    <div class="pname" id="ui-name">山林</div>
-    <div class="pmeta"><span id="ui-kind" hidden>山林</span><span class="dot" id="ui-kdot" hidden>·</span><span id="ui-dist">約320 m</span></div>
-    <div class="acts" aria-hidden="true">
-      <span class="act primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M21.7 11.3 12.7 2.3a1 1 0 0 0-1.4 0l-9 9a1 1 0 0 0 0 1.4l9 9a1 1 0 0 0 1.4 0l9-9a1 1 0 0 0 0-1.4zM14 14.5V12h-4v3H8v-4a1 1 0 0 1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/></svg>経路</span>
-      <span class="act"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1e7be6"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7L12 2z"/></svg>開始</span>
-      <span class="act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e7be6" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>保存</span>
-      <span class="act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e7be6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5M5 13v7h14v-7"/></svg>共有</span>
+    <div id="ui-main">
+      <div class="dev"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#fff"/><circle cx="12" cy="12" r="3.5" fill="#e5231b"/></svg></div>
+      <div class="dname" id="ui-name">TAG-01</div>
+      <div class="dsub"><i></i><span>受信中</span></div>
     </div>
     <div id="ctrl" hidden>
-      <div class="crow"><span class="clabel">表記</span><div class="seg" id="nameseg"><button type="button" data-name="" class="on">なし</button><button type="button" data-name="TAG-01">TAG-01</button><button type="button" data-name="こころ">こころ</button></div></div>
+      <div id="ctrl-btns" hidden>
+        <button class="cbtn" id="b-back" type="button" aria-label="10%戻る"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M11 19 2 12l9-7v14zM22 19l-9-7 9-7v14z" fill="#fff"/></svg></button>
+        <button class="cbtn" id="cbtn-play" type="button" aria-label="再生"><svg id="ip" width="22" height="22" viewBox="0 0 24 24"><path d="M6 4l12 8-12 8V4z" fill="#fff"/></svg><svg id="ipu" width="22" height="22" viewBox="0 0 24 24" hidden><rect x="5" y="4" width="4" height="16" fill="#fff"/><rect x="15" y="4" width="4" height="16" fill="#fff"/></svg></button>
+        <button class="cbtn" id="b-fwd" type="button" aria-label="10%進む"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M13 5l9 7-9 7V5zM2 5l9 7-9 7V5z" fill="#fff"/></svg></button>
+        <button class="cbtn" id="b-reset" type="button" aria-label="最初に戻す"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12A9 9 0 1 0 5.64 5.64" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M3 7v5h5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="crow" hidden><span class="clabel">進行</span><input type="range" id="si" min="0" max="1000" value="0"><span class="cval" id="sv">0%</span></div>
+      <div class="crow" hidden><span class="clabel">速度</span><input type="range" id="sp" min="0.25" max="2" value="1" step="0.25"><span class="cval" id="spv">x1.0</span></div>
+      <div class="crow"><span class="clabel">表記</span><div class="seg" id="nameseg"><button type="button" data-name="TAG-01" class="on">TAG-01</button><button type="button" data-name="こころ">こころ</button></div></div>
       <div class="crow"><span class="clabel">北</span><input type="range" id="nd" min="0" max="359" step="1" value="270"><span class="cval" id="ndv">270°</span></div>
-      <div class="crow"><span class="clabel">編集</span><div class="seg" id="editseg"><button type="button" data-ed="" class="on">オフ</button><button type="button" data-ed="map">地図</button><button type="button" data-ed="me">現在地</button><button type="button" data-ed="tag">ピン</button></div></div>
-      <div class="crow" id="viewrow" hidden><span class="clabel"></span><span class="vinfo" id="viewinfo"></span><div class="seg tools" style="flex:none;width:170px"><button type="button" id="vw-north">向きを戻す</button><button type="button" id="vw-reset">初期表示</button></div></div>
-      <div class="crow" id="edrow" hidden><span class="clabel"></span><div class="seg tools"><button type="button" id="ed-clear">消去</button><button type="button" id="ed-copy">コピー</button></div></div>
+      <div class="crow"><span class="clabel">編集</span><div class="seg" id="editseg"><button type="button" data-ed="" class="on">オフ</button><button type="button" data-ed="map">地図</button><button type="button" data-ed="me">自分の位置</button><button type="button" data-ed="tag">タグの位置</button></div></div>
+      <div class="crow" id="viewrow" hidden><span class="clabel"></span><span class="vinfo" id="viewinfo"></span><div class="seg tools" style="flex:none;width:96px"><button type="button" id="vw-reset">初期表示</button></div></div>
+      <div class="crow" id="edrow" hidden><span class="clabel"></span><div class="seg tools"><button type="button" id="ed-undo" hidden>1点戻す</button><button type="button" id="ed-clear">消去</button><button type="button" id="ed-copy">コピー</button></div></div>
       <div class="hint" id="hint">地図を長押しでこのパネルを閉じる</div>
     </div>
   </div>
@@ -230,18 +245,18 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--acc)}
 <script>
 (()=>{
 /* ===================== 設定 =====================
-   位置は地図画像に対する割合(0〜1)。画面上で置き直すとこのブラウザに記憶される。
-   地図の大きさ・向き・中心も、編集モードでドラッグ/ピンチすると記憶され、撮影時はその見え方で表示される。
-   地図は埋め込まず、起動時の選択画面でs92の地図画像を選ぶ。 */
-let PIN_LABEL=''; // ピンの名前。空=名前なし(ピンの下に文字を出さず、シートの見出しは「山林」)
-const MAP_ZOOM=1.35; // 表示を調整していないときの地図の拡大率(1=画面を埋める大きさ)
-const M_PER_PX=2.5;  // 地図画像1pxあたりの距離(m)。距離・縮尺の表示に使う
-const ZMIN=0.5,ZMAX=6; // ピンチで変えられる拡大率の範囲
+   ルートは地図画像に対する割合(0〜1)で保存。画面上で打ち直すとこのブラウザに記憶される。
+   地図は埋め込まず、起動時の選択画面でs92の地図画像を選ぶ。ルートは画面上で打つ(初期値は空)。
+   進行0%→100%で、自分とタグがそれぞれのルートを出発点から終点まで同時に移動する。 */
+let TAG_LABEL='TAG-01';
+const DURATION=90000; // x1.0で全行程90秒
+const MAP_ZOOM=1.35; // 見え方を調整していないときの地図の拡大率(1=画面を埋める大きさ)
+const ZMIN=1,ZMAX=6; // ピンチで変えられる拡大率の範囲(1より小さくすると地図の外が見えるので1まで)
 const DEF={
-  me:[[0.6171,0.5038]], // 現在地: 画面中央の山あいにある点線の道の先端
-  tag:[[0.6692,0.434]], // ピン: 現在地から画面の右斜め上、山の中
-  north:270, // 北は方位磁針の西側(左)を指す(地図を回していないとき)
-  view:null  // 地図の見え方 {z:拡大率,r:回転(度),c:[中心u,中心v]}。null=現在地とピンの中間を中心に自動
+  me:[[0.6171,0.5038]], // 自分(現在地): 画面中央の山あいにある点線の道の先端。移動しない
+  tag:[[0.6692,0.434]], // タグ: 現在地から画面の真上方向へ少し進んだ山の中。移動しない
+  north:270, // 北は方位磁針の西側(左)を指す
+  view:null  // 地図の見え方 {z:拡大率,c:[中心u,中心v]}。null=自分とタグの中間を中心に自動。編集モードのピンチ/ドラッグで変わる
 };
 const DEFAULT_MAP=''; // 埋め込みなし: 起動時に地図を選ぶ画面を出す
 /* ================================================ */
@@ -251,12 +266,11 @@ const wrap=$('wrap'),cv=$('cv'),ctx=cv.getContext('2d');
 const cfg={me:DEF.me.slice(),tag:DEF.tag.slice(),north:DEF.north,view:DEF.view};
 let img=new Image(),IW=922,IH=1719;
 
-/* 保存(このブラウザ内) */
+/* 保存(このブラウザ内)。①・③とは別の保存先 */
 const DB={open(){return new Promise((ok,ng)=>{try{const r=indexedDB.open('gps-mock-s92',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>ng(r.error)}catch(e){ng(e)}})},
   async get(k){const d=await this.open();return new Promise(ok=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ok(null)})},
   async set(k,v){const d=await this.open();return new Promise(ok=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>ok();t.onerror=()=>ok()})}};
 const saveCfg=()=>DB.set('cfg92',{me:cfg.me,tag:cfg.tag,north:cfg.north,view:cfg.view,v:5}).catch(()=>{});
-const validView=v=>v&&typeof v.z==='number'&&typeof v.r==='number'&&Array.isArray(v.c)&&v.c.length===2;
 
 let mapURL=null;
 function showMap(blob,save){
@@ -270,54 +284,60 @@ document.getElementById('mapfile').addEventListener('change',e=>{const f=e.targe
 if(DEFAULT_MAP){document.getElementById('picker').hidden=true;
   const d=new Image();d.onload=()=>{if(!mapURL){img=d;IW=d.naturalWidth;IH=d.naturalHeight;rebuild();frame()}};d.src=DEFAULT_MAP}
 // 地図が埋め込まれていないときは、前に選んだ地図があればそれを使い、なければ選択画面を出したままにする
-if(!DEFAULT_MAP)DB.get('map92').then(b=>{if(b)showMap(b,false)}).catch(()=>{});
-DB.get('cfg92').then(c=>{if(c&&Array.isArray(c.me)&&Array.isArray(c.tag)){const ok=c.v===5;
-  cfg.me=ok&&c.me.length?c.me:DEF.me.slice();cfg.tag=ok&&c.tag.length?c.tag:DEF.tag.slice();
-  if(c.v>=2&&typeof c.north==='number')cfg.north=c.north;cfg.view=ok&&validView(c.view)?c.view:DEF.view;
-  rebuild();frame();sync()}}).catch(()=>{});
+DB.get('map92').then(b=>{if(b)showMap(b,false)}).catch(()=>{});
+DB.get('cfg92').then(c=>{if(c&&Array.isArray(c.me)&&Array.isArray(c.tag)){const ok=c.v===5;cfg.me=ok&&c.me.length?c.me:DEF.me.slice();cfg.tag=ok&&c.tag.length?c.tag:DEF.tag.slice();if(c.v>=2&&typeof c.north==='number')cfg.north=c.north;cfg.view=ok&&c.view&&typeof c.view.z==='number'&&Array.isArray(c.view.c)?c.view:DEF.view;rebuild();frame();sync()}}).catch(()=>{});
 
-let editing='';
+let progress=0,speed=1,playing=false,last=null,seeking=false,editing='';
+
+/* ルート: 距離に沿って等速で進む */
 const px=a=>a.map(([u,v])=>[u*IW,v*IH]);
-let meP=null,tagP=null;
-function rebuild(){meP=cfg.me.length?px(cfg.me)[0]:null;tagP=cfg.tag.length?px(cfg.tag)[0]:null;info()}
-
-/* 距離 */
-function info(){
-  if(!meP||!tagP)return;
-  const m=Math.hypot(meP[0]-tagP[0],meP[1]-tagP[1])*M_PER_PX;
-  const r=m<1000?`約${Math.max(10,Math.round(m/10)*10)} m`:`約${(m/1000).toFixed(1)} km`;
-  $('ui-dist').textContent=r;
+function sampler(pts){
+  const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+  const tot=L[L.length-1]||0;
+  return f=>{
+    if(!pts.length)return null;
+    if(pts.length===1||!tot)return{p:pts[0],a:null};
+    const d=Math.max(0,Math.min(1,f))*tot;let i=1;while(i<L.length-1&&L[i]<d)i++;
+    const a=pts[i-1],b=pts[i],t=(d-L[i-1])/((L[i]-L[i-1])||1);
+    return{p:[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t],a:Math.atan2(b[1]-a[1],b[0]-a[0])};
+  };
 }
+let meS=sampler([]),tagS=sampler([]);
+function rebuild(){meS=sampler(px(cfg.me));tagS=sampler(px(cfg.tag))}
+
+/* 方位磁針の目盛り */
+(()=>{let h='';for(let i=0;i<72;i++){const a=i*5*Math.PI/180,l=i%18===0?10:i%2===0?6:3,r1=52,r2=r1-l;
+  h+=`<line x1="${60+Math.sin(a)*r1}" y1="${60-Math.cos(a)*r1}" x2="${60+Math.sin(a)*r2}" y2="${60-Math.cos(a)*r2}" stroke="#16202a" stroke-opacity="${i%18===0?.8:.35}" stroke-width="${i%18===0?2:1}"/>`}
+  $('dial').innerHTML=h})();
 
 /* 画面サイズと地図の配置
-   画面上の点 = 基準点(A) + 回転(R)・拡大(S) × (地図上の点 − 地図の中心(C)) */
-let vw=0,vh=0,dpr=1,topH0=0,uiH0=0,S=1,R=0,CX=0,CY=0,AX=0,AY=0;
+   撮影時も編集時も同じ見え方。地図の中心(C)が画面の基準点(A)に来るように置く */
+let vw=0,vh=0,dpr=1,S=1,OX=0,OY=0,topH0=0,uiH0=0;
 const cover=()=>Math.max(vw/IW,vh/IH);
-// 下部シートの高さ(操作パネルを除く)。パネルを開いても地図の見え方が変わらないように
-function uiBase(){const u=document.getElementById('ui'),c=document.getElementById('ctrl');return u.offsetHeight-(c.hidden?0:c.offsetHeight+14)}
+// 下の情報パネルの高さ(操作パネルを除く)。操作パネルを開いても地図の見え方が変わらないように
+function uiBase(){const u=document.getElementById('ui'),c=document.getElementById('ctrl');
+  return u.offsetHeight-(c.hidden?0:c.offsetHeight+parseFloat(getComputedStyle(c).marginTop||0))}
+const anchorY=()=>(topH0+70+vh-uiBase()-60)/2;
 function autoView(){
-  const a=meP||tagP,b=tagP||meP;let cx=a?(a[0]+b[0])/2:IW/2,cy=a?(a[1]+b[1])/2:IH/2;
-  // 地図の端が見えないように中心を寄せる
-  const s=cover()*MAP_ZOOM,ay=(topH0+vh-uiBase())/2;
-  cx=Math.min(IW-(vw/2)/s,Math.max((vw/2)/s,cx));cy=Math.min(IH-(vh-ay)/s,Math.max(ay/s,cy));
-  return{z:MAP_ZOOM,r:0,c:[cx/IW,cy/IH]};
+  const p=[...px(cfg.me),...px(cfg.tag)];let cx=IW/2,cy=IH/2;
+  if(p.length){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[x,y]of p){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}cx=(x0+x1)/2;cy=(y0+y1)/2}
+  return{z:MAP_ZOOM,c:[cx/IW,cy/IH]};
 }
 const curView=()=>cfg.view||autoView();
 function frame(){
   if(!vw||!vh)return;const v=curView();
-  S=cover()*v.z;R=v.r*Math.PI/180;CX=v.c[0]*IW;CY=v.c[1]*IH;AX=vw/2;AY=(topH0+vh-uiBase())/2;
-  scaleBar();sync();
+  S=cover()*v.z;OX=vw/2-v.c[0]*IW*S;OY=anchorY()-v.c[1]*IH*S;
+  // 地図の端が画面に入らないように寄せる
+  OX=Math.min(0,Math.max(vw-IW*S,OX));OY=Math.min(0,Math.max(vh-IH*S,OY));
+  if(editing){const z=v.z;$('viewinfo').textContent=`地図の大きさ x${z.toFixed(2)}`}
 }
-function base(x,y){const dx=(x-CX)*S,dy=(y-CY)*S,c=Math.cos(R),s=Math.sin(R);return[AX+dx*c-dy*s,AY+dx*s+dy*c]}
-function unbase(X,Y){const dx=X-AX,dy=Y-AY,c=Math.cos(R),s=Math.sin(R);return[CX+(dx*c+dy*s)/S,CY+(-dx*s+dy*c)/S]}
-/* 縮尺バー */
-function scaleBar(){
-  const mpp=M_PER_PX/(S*(1+(ZOOM-1)*cam.t));const target=70*mpp;
-  const nice=[10,20,50,100,200,500,1000,2000,5000].find(v=>v>=target*.7)||5000;
-  $('scale-t').textContent=nice>=1000?`${nice/1000} km`:`${nice} m`;$('scale-b').style.width=Math.round(nice/mpp)+'px';
-}
-function placeFabs(){const h=document.getElementById('ui').offsetHeight;$('fabsB').style.bottom=(h+14)+'px';$('scale').style.bottom=(h+16)+'px';
-  $('fabsT').style.top=(topH0+6)+'px'}
+// 今の配置(OX,OY,S)を見え方として記憶する
+function storeView(z){cfg.view={z:+z.toFixed(3),c:[+((vw/2-OX)/S/IW).toFixed(4),+((anchorY()-OY)/S/IH).toFixed(4)]}}
+// 画面上の点(PX,PY)の下にある地図の位置を動かさずに拡大率を z にする
+function zoomAt(z,PX,PY){z=Math.min(ZMAX,Math.max(ZMIN,z));const ix=(PX-OX)/S,iy=(PY-OY)/S;
+  S=cover()*z;OX=PX-ix*S;OY=PY-iy*S;OX=Math.min(0,Math.max(vw-IW*S,OX));OY=Math.min(0,Math.max(vh-IH*S,OY));storeView(z);frame()}
+function panBy(dX,dY){const z=curView().z;OX+=dX;OY+=dY;OX=Math.min(0,Math.max(vw-IW*S,OX));OY=Math.min(0,Math.max(vh-IH*S,OY));storeView(z);frame()}
+function placeFabs(){$('fabs').style.bottom=$('fabsL').style.bottom=(document.getElementById('ui').offsetHeight+14)+'px'}
 function resize(){
   wrap.style.transform='';
   if(innerWidth>=480){const k=Math.min(1,(innerHeight-60)/896,(innerWidth-60)/414);wrap.style.transform=k<1?`scale(${k})`:''}
@@ -327,114 +347,137 @@ function resize(){
   frame();placeFabs();
 }
 
-/* 現在地ボタン用カメラ: t=0 通常 / t=1 現在地を中心に拡大 */
+/* 現在地ボタン用カメラ: t=0 全体 / t=1 自分を中心に拡大 */
 const ZOOM=1.9;const cam={t:0,goal:0,fx:0,fy:0,cx:0,cy:0};
 const camApply=(X,Y)=>{const t=cam.t,z=1+(ZOOM-1)*t;return[cam.fx+(X-cam.fx)*z+(cam.cx-cam.fx)*t,cam.fy+(Y-cam.fy)*z+(cam.cy-cam.fy)*t]};
-const sc=(x,y)=>camApply(...base(x,y));
+const sc=(x,y)=>camApply(OX+x*S,OY+y*S);
 function unsc(X,Y){const t=cam.t,z=1+(ZOOM-1)*t;
-  return unbase(cam.fx+(X-cam.fx-(cam.cx-cam.fx)*t)/z,cam.fy+(Y-cam.fy-(cam.cy-cam.fy)*t)/z)}
+  const a=cam.fx+(X-cam.fx-(cam.cx-cam.fx)*t)/z,b=cam.fy+(Y-cam.fy-(cam.cy-cam.fy)*t)/z;return[(a-OX)/S,(b-OY)/S]}
+const fmtSp=v=>'x'+(+v<1?(+v).toFixed(2):(+v).toFixed(1));
 
-/* 描画: ピン */
-let pinDrop=performance.now();
-function drawPin(ts,pos){
+/* 描画 */
+let tagFlash=0;
+function drawTag(ts,pos){
   const[x,y]=sc(...pos);
-  const e=Math.min(1,(performance.now()-pinDrop)/450),bounce=e<1?(1-e)*(1-e)*-40:0;
-  ctx.beginPath();ctx.ellipse(x,y,7,3,0,0,7);ctx.fillStyle='rgba(0,0,0,.22)';ctx.fill();
-  const py=y+bounce;
-  ctx.save();ctx.translate(x,py);
-  ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(-4,-10,-14,-18,-14,-30);ctx.arc(0,-30,14,Math.PI,0);ctx.bezierCurveTo(14,-18,4,-10,0,0);ctx.closePath();
-  ctx.fillStyle='#e8453c';ctx.shadowBlur=8;ctx.shadowColor='rgba(0,0,0,.3)';ctx.shadowOffsetY=2;ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-  ctx.lineWidth=1.5;ctx.strokeStyle='#b8302a';ctx.stroke();
-  ctx.beginPath();ctx.arc(0,-30,5.2,0,7);ctx.fillStyle='#fff';ctx.fill();
-  ctx.restore();
-  const lab=PIN_LABEL;if(!lab)return;ctx.font='700 13px "Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
-  ctx.lineJoin='round';ctx.lineWidth=4;ctx.strokeStyle='rgba(255,255,255,.95)';ctx.strokeText(lab,x,y+6);ctx.fillStyle='#c0352d';ctx.fillText(lab,x,y+6);
+  if(tagFlash){const e=(performance.now()-tagFlash)/900;if(e<1){ctx.beginPath();ctx.arc(x,y,12+e*70,0,7);ctx.strokeStyle=`rgba(229,35,27,${1-e})`;ctx.lineWidth=4*(1-e)+1;ctx.stroke()}}
+  for(let k=0;k<3;k++){const p=((ts/2200)+k/3)%1;ctx.beginPath();ctx.arc(x,y,10+p*46,0,7);
+    ctx.strokeStyle=`rgba(229,35,27,${(1-p)*.7})`;ctx.lineWidth=2;ctx.stroke()}
+  ctx.beginPath();ctx.arc(x,y,22,0,7);ctx.fillStyle='rgba(229,35,27,.14)';ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,12,0,7);ctx.fillStyle='#fff';ctx.shadowBlur=6;ctx.shadowColor='rgba(0,0,0,.3)';ctx.fill();ctx.shadowBlur=0;
+  ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fillStyle='#e5231b';ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,3.2,0,7);ctx.fillStyle='#fff';ctx.fill();
+  ctx.font=/^[\x00-\x7f]*$/.test(TAG_LABEL)?'600 11px "IBM Plex Mono",ui-monospace,monospace':'700 12px "Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+  const tw=ctx.measureText(TAG_LABEL).width,flip=x+20+tw+12>vw-6,lx=flip?x-20-tw-12:x+20,ly=y-20,ex=flip?lx+tw+12:lx;
+  ctx.fillStyle='#e5231b';ctx.fillRect(lx,ly-9,tw+12,18);
+  // 画面右端に近いときはラベルを左側に出す
+  ctx.beginPath();ctx.moveTo(ex,ly+9);ctx.lineTo(flip?ex+6:ex-6,ly+15);ctx.lineTo(flip?ex-6:ex+6,ly+9);ctx.fill();
+  ctx.fillStyle='#fff';ctx.fillText(TAG_LABEL,lx+6,ly+.5);
 }
-/* 描画: 現在地(青い点と向きの扇形) */
 function drawMe(me,hd,ts){
   const[x,y]=sc(...me);
-  // やさしい点滅: 3秒周期でゆっくり明るさと周りの光がふくらむ(向きの表示はなし)
-  const k=.5-.5*Math.cos(ts/3000*Math.PI*2);
-  ctx.beginPath();ctx.arc(x,y,16+14*k,0,7);ctx.fillStyle=`rgba(30,123,230,${.20-.12*k})`;ctx.fill();
-  ctx.beginPath();ctx.arc(x,y,10,0,7);ctx.fillStyle='#fff';ctx.shadowBlur=6;ctx.shadowColor='rgba(0,0,0,.25)';ctx.fill();ctx.shadowBlur=0;
-  ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fillStyle=`rgba(30,123,230,${1-.35*k})`;ctx.fill();
+  const k=.5-.5*Math.cos(ts/2600*Math.PI*2);
+  ctx.beginPath();ctx.arc(x,y,14+12*k,0,7);ctx.fillStyle=`rgba(0,162,150,${.06+.16*k})`;ctx.fill();
+  ctx.save();ctx.translate(x,y);ctx.rotate(hd);
+  ctx.beginPath();ctx.moveTo(0,-15);ctx.lineTo(11,12);ctx.lineTo(0,6);ctx.lineTo(-11,12);ctx.closePath();
+  ctx.fillStyle='#00a296';ctx.shadowBlur=6;ctx.shadowColor='rgba(0,0,0,.35)';ctx.fill();ctx.shadowBlur=0;
+  ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();ctx.restore();
 }
-/* 編集中だけ見える目印 */
+/* 編集中だけ見えるルート線(撮影時は表示されない) */
 function drawEdit(){
-  for(const[k,col,lab]of[['me','#1e7be6','現在地'],['tag','#e8453c','ピン']]){
+  for(const[k,col,lab]of[['me','#00a296','自分'],['tag','#e5231b','タグ']]){
     const p=px(cfg[k]).map(q=>sc(...q));if(!p.length)continue;
-    ctx.globalAlpha=editing===k?1:.45;
+    ctx.globalAlpha=editing===k?1:.4;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q));
+    ctx.strokeStyle='#fff';ctx.lineWidth=6;ctx.stroke();ctx.strokeStyle=col;ctx.lineWidth=3;ctx.stroke();
+    p.forEach((q,i)=>{const end=i===0||i===p.length-1;ctx.beginPath();ctx.arc(q[0],q[1],end?6:3.5,0,7);ctx.fillStyle=i===0?'#fff':col;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=col;ctx.stroke()});
     ctx.font='700 11px "Zen Kaku Gothic New","Hiragino Sans",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.strokeText(lab,p[0][0]+16,p[0][1]-12);ctx.fillStyle=col;ctx.fillText(lab,p[0][0]+16,p[0][1]-12);
+    ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.strokeText(lab,p[0][0]+10,p[0][1]);ctx.fillStyle=col;ctx.fillText(lab,p[0][0]+10,p[0][1]);
     ctx.globalAlpha=1;
   }
 }
-let clockT=0;
+let heading=null,clockT=0;
+/* 自分とタグの中間が画面中央に来るように地図をなめらかに動かす */
+const follow={snap:true};
+function followCam(m,g){
+  const top=topH0,bot=vh-uiH0,cx=(m[0]+g[0])/2,cy=(m[1]+g[1])/2;
+  let tx=vw/2-cx*S,ty=(top+70+bot-60)/2-cy*S;
+  tx=Math.min(0,Math.max(vw-IW*S,tx));ty=Math.min(0,Math.max(vh-IH*S,ty));
+  if(follow.snap){OX=tx;OY=ty;follow.snap=false}else{OX+=(tx-OX)*.06;OY+=(ty-OY)*.06}
+}
 function draw(ts){
-  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#f4f1ea';ctx.fillRect(0,0,vw,vh);
-  if(meP){[cam.fx,cam.fy]=base(...meP)}
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,vw,vh);
+  const m=meS(progress),g=tagS(progress);
+  if(m){cam.fx=OX+m.p[0]*S;cam.fy=OY+m.p[1]*S}
   cam.cx=vw/2;cam.cy=topH0+(vh-topH0-uiBase())/2;
-  const pt=cam.t;cam.t+=(cam.goal-cam.t)*.08;if(Math.abs(cam.goal-cam.t)<.001)cam.t=cam.goal;if(pt!==cam.t)scaleBar();
-  if(img.complete&&img.naturalWidth){
-    const t=cam.t,zc=1+(ZOOM-1)*t;
-    ctx.save();ctx.translate(cam.fx*(1-zc)+(cam.cx-cam.fx)*t,cam.fy*(1-zc)+(cam.cy-cam.fy)*t);ctx.scale(zc,zc);
-    ctx.translate(AX,AY);ctx.rotate(R);ctx.scale(S,S);ctx.imageSmoothingQuality='high';ctx.drawImage(img,-CX,-CY);ctx.restore();
-  }
+  cam.t+=(cam.goal-cam.t)*.08;if(Math.abs(cam.goal-cam.t)<.001)cam.t=cam.goal;
+  if(img.complete&&img.naturalWidth){ctx.imageSmoothingQuality='high';const[ix,iy]=sc(0,0),zz=1+(ZOOM-1)*cam.t;ctx.drawImage(img,ix,iy,IW*S*zz,IH*S*zz)}
   if(editing)drawEdit();
-  // 現在地の向き: ピンの方を向く(地図を回すと一緒に回る)
-  if(meP){let hd=0;if(tagP){const a=sc(...meP),b=sc(...tagP);hd=Math.atan2(b[1]-a[1],b[0]-a[0])+Math.PI/2}drawMe(meP,hd,ts)}
-  if(tagP)drawPin(ts,tagP);
+  if(m){
+    // 矢印は進行方向を向く(曲がり角はなめらかに回る)
+    if(m.a!=null){const tg=m.a+Math.PI/2;if(heading==null)heading=tg;else{const d=Math.atan2(Math.sin(tg-heading),Math.cos(tg-heading));heading+=d*.15}}
+    drawMe(m.p,heading||0,ts);
+  }
+  if(g)drawTag(ts,g.p);
   if(ts-clockT>1000){clockT=ts;const n=new Date();$('clock').textContent=`${n.getHours()}:${String(n.getMinutes()).padStart(2,'0')}`}
 }
-function loop(ts){draw(ts);requestAnimationFrame(loop)}
+
+/* ループ */
+function loop(ts){
+  if(last==null)last=ts;const dt=ts-last;last=ts;
+  if(playing&&!seeking&&progress<1){progress=Math.min(1,progress+dt*speed/DURATION);if(progress>=1)setPlaying(false)}
+  if(!seeking){$('si').value=Math.round(progress*1000);$('sv').textContent=Math.round(progress*100)+'%'}
+  draw(ts);requestAnimationFrame(loop);
+}
 
 /* 操作 */
-function sync(){$('nd').value=Math.round(cfg.north);$('ndv').textContent=Math.round(cfg.north)+'°';
-  // 方位磁針は「北の設定+地図の回転」の向きを指す
-  const r=((cfg.north+(cfg.view?cfg.view.r:0))%360+360)%360;$('needle').setAttribute('transform',`rotate(${r} 20 20)`);
-  if(editing){const v=curView();$('viewinfo').textContent=`大きさ x${v.z.toFixed(2)} ・ 向き ${Math.round(((v.r%360)+360)%360)}°`}}
+function setPlaying(v){playing=v;last=null;$('ip').hidden=v;$('ipu').hidden=!v;$('cbtn-play').setAttribute('aria-label',v?'一時停止':'再生')}
+function sync(){$('si').value=Math.round(progress*1000);$('sv').textContent=Math.round(progress*100)+'%';$('sp').value=speed;$('spv').textContent=fmtSp(speed);
+  $('nd').value=Math.round(cfg.north);$('ndv').textContent=Math.round(cfg.north)+'°';
+  $('needle').setAttribute('transform',`rotate(${cfg.north} 60 60)`);$('ntext').setAttribute('transform',`rotate(${-cfg.north} 60 7)`)}
+const resetHeading=()=>{heading=null};
+$('cbtn-play').onclick=()=>{if(progress>=1){progress=0;resetHeading()}setPlaying(!playing)};
+$('b-back').onclick=()=>{progress=Math.max(0,progress-.1);resetHeading();sync()};
+$('b-fwd').onclick=()=>{progress=Math.min(1,progress+.1);resetHeading();sync()};
+$('b-reset').onclick=()=>{progress=0;resetHeading();setPlaying(false);sync()};
+const si=$('si');si.oninput=()=>{progress=si.value/1000;resetHeading();$('sv').textContent=Math.round(progress*100)+'%'};
+si.onpointerdown=()=>seeking=true;addEventListener('pointerup',()=>seeking=false);
+$('sp').oninput=e=>{speed=+e.target.value;$('spv').textContent=fmtSp(speed)};
 $('nd').oninput=e=>{cfg.north=+e.target.value;sync();saveCfg()};
 
 let toastTimer=null;
-function toast(msg){const t=$('toast');$('toast-msg').textContent=msg;t.style.top=(topH0+8)+'px';t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
+function toast(msg){const t=$('toast');$('toast-msg').textContent=msg;t.style.top=(topH0+12)+'px';t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400)}
+let refreshing=false;
+$('b-refresh').onclick=()=>{if(refreshing)return;refreshing=true;const b=$('b-refresh');b.classList.add('spin');
+  setTimeout(()=>{b.classList.remove('spin');refreshing=false;tagFlash=performance.now();toast('最新の位置情報を取得しました')},1100)};
 $('b-locate').onclick=()=>{if(editing)return;cam.goal=cam.goal?0:1;$('b-locate').classList.toggle('on',!!cam.goal);$('b-locate').setAttribute('aria-pressed',cam.goal?'true':'false')};
-$('b-layer').onclick=()=>toast('地図の種類: 標準');
 
 /* 表記切り替え */
 document.querySelectorAll('#nameseg button').forEach(btn=>btn.onclick=()=>{
-  PIN_LABEL=btn.dataset.name;document.querySelectorAll('#nameseg button').forEach(x=>x.classList.toggle('on',x===btn));
-  $('ui-name').textContent=PIN_LABEL||'山林';$('ui-kind').hidden=$('ui-kdot').hidden=!PIN_LABEL;pinDrop=performance.now()});
+  TAG_LABEL=btn.dataset.name;const jp=!/^[\x00-\x7f]*$/.test(TAG_LABEL);
+  document.querySelectorAll('#nameseg button').forEach(x=>x.classList.toggle('on',x===btn));
+  for(const id of['ui-name','m-name']){const e=document.getElementById(id);e.textContent=TAG_LABEL;e.classList.toggle('jpname',jp)}});
 
-/* 編集 */
+/* ルート編集 */
 function setEdit(k){
   editing=k;
   document.querySelectorAll('#editseg button').forEach(b=>b.classList.toggle('on',b.dataset.ed===k));
   $('edrow').hidden=!k;$('viewrow').hidden=!k;$('ed-clear').hidden=!(k==='me'||k==='tag');
-  $('hint').textContent=k==='map'?'ドラッグで移動・2本指で拡大/回転(PCはホイールで拡大、Shift+ホイールで回転)'
-    :k?`タップで${k==='me'?'現在地':'ピン'}を置く・ドラッグで移動・2本指で拡大/回転`:'地図を長押しでこのパネルを閉じる';
+  $('hint').textContent=k==='map'?'ドラッグで地図を動かす・2本指で拡大縮小(PCはホイール)'
+    :k?`タップで${k==='me'?'自分(現在地)':'タグ'}を置く・ドラッグで移動・2本指で拡大縮小`:'地図を長押しでこのパネルを閉じる';
   if(k){cam.goal=0;cam.t=0;$('b-locate').classList.remove('on');$('b-locate').setAttribute('aria-pressed','false')}
-  frame();
+  uiH0=document.getElementById('ui').offsetHeight;frame();
 }
-document.querySelectorAll('#editseg button').forEach(b=>b.onclick=()=>setEdit(b.dataset.ed));
-$('ed-clear').onclick=()=>{if(!(editing==='me'||editing==='tag')||!cfg[editing].length)return;if(confirm(`${editing==='me'?'現在地':'ピン'}を消しますか？`)){cfg[editing]=[];rebuild();frame();saveCfg()}};
-$('ed-copy').onclick=()=>{const s=JSON.stringify({me:cfg.me,tag:cfg.tag,north:cfg.north,view:cfg.view});
-  (navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast('設定をコピーしました'),()=>toast('コピーできませんでした'))};
-$('vw-north').onclick=()=>{const v={...curView()};setViewKeep(v.z,0,vw/2,AY);saveCfg()};
 $('vw-reset').onclick=()=>{cfg.view=null;frame();saveCfg();toast('地図の見え方を初期状態に戻しました')};
+document.querySelectorAll('#editseg button').forEach(b=>b.onclick=()=>setEdit(b.dataset.ed));
+$('ed-undo').onclick=()=>{if(!editing)return;cfg[editing].pop();rebuild();saveCfg()};
+$('ed-clear').onclick=()=>{if(!(editing==='me'||editing==='tag')||!cfg[editing].length)return;if(confirm(`${editing==='me'?'自分':'タグ'}の位置を消しますか？`)){cfg[editing]=[];rebuild();saveCfg()}};
+$('ed-copy').onclick=()=>{const s=JSON.stringify({me:cfg.me,tag:cfg.tag,north:cfg.north,view:cfg.view});
+  (navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast('位置をコピーしました'),()=>toast('コピーできませんでした'))};
 function addPoint(e){
-  const[X,Y]=toLocal(e),[x,y]=unsc(X,Y);if(x<0||y<0||x>IW||y>IH)return;
-  cfg[editing]=[[+(x/IW).toFixed(4),+(y/IH).toFixed(4)]];rebuild();if(!cfg.view)frame();saveCfg();
-  if(editing==='tag')pinDrop=performance.now();
+  const r=wrap.getBoundingClientRect(),X=(e.clientX-r.left)*vw/r.width,Y=(e.clientY-r.top)*vh/r.height;
+  const[x,y]=unsc(X,Y);if(x<0||y<0||x>IW||y>IH)return;
+  cfg[editing]=[[+(x/IW).toFixed(4),+(y/IH).toFixed(4)]];rebuild();if(!cfg.view)frame();saveCfg(); // ④は移動しないので常に1点
 }
-
-/* 地図の見え方を変える: 画面上の点(PX,PY)の下にある地図の位置を動かさずに、大きさ z・向き r にする */
-function setViewKeep(z,r,PX,PY){
-  const[ix,iy]=unbase(PX,PY);z=Math.min(ZMAX,Math.max(ZMIN,z));
-  const s=cover()*z,a=r*Math.PI/180,c=Math.cos(a),sn=Math.sin(a),dx=PX-AX,dy=PY-AY;
-  const cx=ix-(dx*c+dy*sn)/s,cy=iy-(-dx*sn+dy*c)/s;
-  cfg.view={z:+z.toFixed(3),r:+r.toFixed(1),c:[+(cx/IW).toFixed(4),+(cy/IH).toFixed(4)]};frame();
-}
-function panBy(dX,dY){const v=curView(),[ix,iy]=unbase(AX-dX,AY-dY);cfg.view={z:v.z,r:v.r,c:[+(ix/IW).toFixed(4),+(iy/IH).toFixed(4)]};frame()}
 
 /* メニュー */
 const menu=$('menu');
@@ -447,25 +490,20 @@ $('m-close').onclick=closeMenu;menu.addEventListener('click',e=>{if(e.target===m
 new ResizeObserver(()=>{uiH0=document.getElementById('ui').offsetHeight;placeFabs();frame()}).observe(document.getElementById('ui'));
 
 /* 地図の操作
-   長押し=操作パネル開閉 / 編集中: タップ=位置を置く・ドラッグ=移動・2本指=拡大と回転 */
+   長押し=操作パネル開閉 / 編集中: タップ=位置を置く・ドラッグ=地図を動かす・2本指=拡大縮小 */
 function toLocal(e){const r=wrap.getBoundingClientRect();return[(e.clientX-r.left)*vw/r.width,(e.clientY-r.top)*vh/r.height]}
-const pts=new Map();let lp=null,lpFired=false,down=null,drag=null,pinch=null,moved=false;
+const pts=new Map();let lp=null,lpFired=false,down=null,drag=null,pinch=null;
 const canEdit=()=>!!editing&&!$('ctrl').hidden;
 function togglePanel(){const c=$('ctrl');c.hidden=!c.hidden;if(c.hidden&&editing)setEdit('');frame()}
-function startPinch(){const[a,b]=[...pts.values()];const v=curView();
-  pinch={d:Math.hypot(b[0]-a[0],b[1]-a[1])||1,ang:Math.atan2(b[1]-a[1],b[0]-a[0]),mx:(a[0]+b[0])/2,my:(a[1]+b[1])/2,z:v.z,r:v.r}}
-wrap.addEventListener('pointerdown',e=>{if(e.target.closest('#ui,.fabs,#menu,.toast,#picker,.top'))return;
+function pinchState(){const[a,b]=[...pts.values()];return{d:Math.hypot(b[0]-a[0],b[1]-a[1])||1,mx:(a[0]+b[0])/2,my:(a[1]+b[1])/2}}
+wrap.addEventListener('pointerdown',e=>{if(e.target.closest('#ui,.fabs,#menu,.toast,#picker'))return;
   pts.set(e.pointerId,toLocal(e));try{wrap.setPointerCapture(e.pointerId)}catch(_){}
-  if(pts.size===1){down={x:e.clientX,y:e.clientY};moved=false;lpFired=false;clearTimeout(lp);lp=setTimeout(()=>{lpFired=true;togglePanel()},600)}
-  else{clearTimeout(lp);down=null;drag=null;if(canEdit()&&pts.size===2)startPinch()}});
+  if(pts.size===1){down={x:e.clientX,y:e.clientY};lpFired=false;clearTimeout(lp);lp=setTimeout(()=>{lpFired=true;togglePanel()},600)}
+  else{clearTimeout(lp);down=null;drag=null;if(canEdit()&&pts.size===2)pinch=pinchState()}});
 wrap.addEventListener('pointermove',e=>{
   if(!pts.has(e.pointerId))return;const prev=pts.get(e.pointerId),cur=toLocal(e);pts.set(e.pointerId,cur);
-  if(pinch&&pts.size>=2){const[a,b]=[...pts.values()];
-    const d=Math.hypot(b[0]-a[0],b[1]-a[1])||1,ang=Math.atan2(b[1]-a[1],b[0]-a[0]),mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
-    panBy(mx-pinch.mx,my-pinch.my);
-    setViewKeep(pinch.z*d/pinch.d,pinch.r+(ang-pinch.ang)*180/Math.PI,mx,my);
-    pinch.mx=mx;pinch.my=my;pinch.z=curView().z;pinch.r=curView().r;pinch.d=d;pinch.ang=ang;return}
-  if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>8){clearTimeout(lp);down=null;if(canEdit())drag=true}
+  if(pinch&&pts.size>=2){const n=pinchState();panBy(n.mx-pinch.mx,n.my-pinch.my);zoomAt(curView().z*n.d/pinch.d,n.mx,n.my);pinch=n;return}
+  if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>8){clearTimeout(lp);down=null;if(canEdit()&&!cam.t)drag=true}
   if(drag)panBy(cur[0]-prev[0],cur[1]-prev[1]);
 });
 function endPointer(e,cancel){
@@ -476,10 +514,10 @@ function endPointer(e,cancel){
 }
 wrap.addEventListener('pointerup',e=>endPointer(e,false));
 wrap.addEventListener('pointercancel',e=>endPointer(e,true));
-wrap.addEventListener('wheel',e=>{if(!canEdit())return;e.preventDefault();const[X,Y]=toLocal(e),v=curView();
-  if(e.shiftKey)setViewKeep(v.z,v.r+(e.deltaY||e.deltaX)*.15,X,Y);else setViewKeep(v.z*Math.exp(-e.deltaY*.0015),v.r,X,Y);
-  clearTimeout(wrap._wt);wrap._wt=setTimeout(saveCfg,300)},{passive:false});
+wrap.addEventListener('wheel',e=>{if(!canEdit())return;e.preventDefault();const[X,Y]=toLocal(e);
+  zoomAt(curView().z*Math.exp(-e.deltaY*.0015),X,Y);clearTimeout(wrap._wt);wrap._wt=setTimeout(saveCfg,300)},{passive:false});
 wrap.addEventListener('contextmenu',e=>e.preventDefault());
+
 
 addEventListener('resize',resize);
 (document.fonts?document.fonts.ready:Promise.resolve()).then(resize);
